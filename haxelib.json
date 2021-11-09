@@ -1,0 +1,21 @@
+{
+	"name": "yaku_beta",
+	"url": "https://github.com/scottPlusPlus/yaku_beta",
+	"license": "MIT",
+	"tags": [
+		"wip"
+	],
+	"description": "YAKU: Yet Another Kollection of Utils",
+	"version": "0.0.1",
+	"releasenote": "tbd",
+	"contributors": [
+		"scottPlusPlus"
+	],
+	"classPath": "src",
+	"dependencies": {
+		"utest": "",
+		"zenlog": "",
+		"tink_core": "",
+		"compiletime" :""
+	}
+}
