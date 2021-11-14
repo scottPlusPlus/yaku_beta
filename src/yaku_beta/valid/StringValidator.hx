@@ -4,7 +4,7 @@ import yaku_beta.valid.*;
 
 using yaku_core.NullX;
 
-@:forward(errors, firstError, assertValid, asRule, addRule)
+@:forward(allowNull, itemName, rules, tinkErrAdapter, errors, firstError, isValid, validOutcome, asRule, addRule)
 @:access(yaku_beta.valid.Validator)
 abstract StringValidator(Validator<String>) from Validator<String> to Validator<String> {
 	public function new(itemName:String) {
@@ -25,7 +25,7 @@ abstract StringValidator(Validator<String>) from Validator<String> to Validator<
 
 	public function maxLength(v:UInt, ?errMsgOverride:String):StringValidator {
 		var f = function(str:String):ValidationOutcome {
-            if (str.length > v) {
+			if (str.length > v) {
 				var errMsg = errMsgOverride.orFallback('${this.itemName} must be less than ${v} chars.');
 				return Fail([errMsg]);
 			}

@@ -6,19 +6,20 @@ import tink.core.Error;
 using yaku_core.NullX;
 
 class Validator<T> {
-	public var rules:Array<ValidationRule<T>> = [];
+	
 	public var allowNull:Bool = false;
+	/*
+	 * Used in the default error messages. Example: '$itemName cannot be null'
+	 */
+	public var itemName:String;
+	public var rules:Array<ValidationRule<T>> = [];
 
 	/*
 	 *   Strategy for converting / combinig validation errors to a tink.core.Error
 	 *  Validator.errorsAsTinkError is the default 
 	 */
 	public var tinkErrAdapter:Array<String>->String->Error = errorsAsTinkError;
-
-    /*
-    * Used in the default error messages. Example: '$itemName cannot be null'
-    */
-	public var itemName:String;
+	
 
 	public function new(itemName:String) {
 		this.itemName = itemName;

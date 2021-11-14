@@ -2,10 +2,11 @@ package yaku_beta_test.valid;
 
 import yaku_beta.valid.StringValidator;
 import utest.Assert;
+import tink.core.Outcome;
 
 using yaku_core.NullX;
 
-@:access(yaku_beta.dstruct.Heap)
+
 class StringValidatorTest extends utest.Test {
 
     function testMinLength() {
@@ -22,6 +23,18 @@ class StringValidatorTest extends utest.Test {
         var v = new StringValidator(name).maxLength(5);
         Assert.equals(0, v.errors("12345").length);
         Assert.equals(1, v.errors("123456").length);
+    }
+
+    function testExample() {
+        var name = "foo";
+        var v = new StringValidator(name)
+            .minLength(3).maxLength(12).contains("foo");
+
+        var o = v.validOutcome("foo2");
+        Assert.isTrue(o.isSuccess());
+
+        o = v.validOutcome("asfdasfd");
+        Assert.isFalse(o.isSuccess());
     }
 }
 

@@ -2,7 +2,7 @@ package yaku_beta.valid;
 
 using yaku_core.NullX;
 
-@:forward(errors, firstError, assertValid, asRule, addRule)
+@:forward(allowNull, itemName, rules, tinkErrAdapter, errors, firstError, isValid, validOutcome, asRule, addRule)
 @:access(yaku_beta.valid.Validator)
 abstract ArrayValidator<T> (Validator<Array<T>>) from Validator<Array<T>> to Validator<Array<T>> {
 
