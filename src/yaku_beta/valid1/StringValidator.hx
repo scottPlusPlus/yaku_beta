@@ -1,6 +1,6 @@
 package yaku_beta.valid1;
 
-import yaku_beta.valid.*;
+import yaku_beta.valid1.*;
 
 using yaku_core.NullX;
 

@@ -2,38 +2,35 @@ package yaku_beta.valid;
 
 using yaku_core.NullX;
 
-@:access(yaku_beta.valid.ValueValidator)
 class StringValidator {
     
-    public static function minLength(validator:ValueValidator<String>, v:UInt, ?errMsgOverride:String):ValueValidator<String> {
-        if (validator.isNull){
-            return validator;
-        }
+    public static inline function minLength(validator:Validator<String>, v:UInt, ?errMsgOverride:String):Validator<String> {
         if (validator.value.length < v){
             var msg = errMsgOverride.orFallback('${validator.name} must be less than ${v} chars.');
-            validator.errors.push(msg);
+            validator.rule([msg]);
         }
         return validator;
     }
 
-    public static function maxLength(validator:ValueValidator<String>, v:UInt, ?errMsgOverride:String):ValueValidator<String> {
-        if (validator.isNull){
-            return validator;
-        }
+    public static inline function maxLength(validator:Validator<String>, v:UInt, ?errMsgOverride:String):Validator<String> {
         if (validator.value.length > v){
             var msg = errMsgOverride.orFallback('${validator.name} must be at least ${v} chars.');
-            validator.errors.push(msg);
+            validator.rule([msg]);
         }
         return validator;
     }
 
-    public static function contains(validator:ValueValidator<String>, needle:String, ?errMsgOverride:String):ValueValidator<String> {
-        if (validator.isNull){
-            return validator;
-        }
+    public static inline function contains(validator:Validator<String>, needle:String, ?errMsgOverride:String):Validator<String> {
         if (!StringTools.contains(validator.value, needle)) {
             var msg = errMsgOverride.orFallback('${validator.name} must contain ${needle}');
-            validator.errors.push(msg);
+            validator.rule([msg]);
+        }
+        return validator;
+    }
+
+    public static inline function regex(validator:Validator<String>, regex:EReg, errMsg:String):Validator<String> {
+        if (!regex.match(validator.value)) {
+            validator.rule([errMsg]);
         }
         return validator;
     }
