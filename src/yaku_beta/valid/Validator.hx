@@ -1,92 +1,46 @@
 package yaku_beta.valid;
 
-import tink.CoreApi.Outcome;
-import tink.core.Error;
+import yaku_beta.valid.*;
+import haxe.ds.ReadOnlyArray;
 
-using yaku_core.NullX;
+using yaku_core.ArrayX;
+// static function validate(g:Gallery) {
+//     var v = new Validation("Gallery"); //effectively just an Array<String> ??
+//     v.assertThat(g.title).minChar(3).maxChar(123);
+//     v.assertThat(g.description).contains("foo");
+//     v.also(g.child).rule(Gallery.validate)
+//     return v;
+// }
 
-class Validator<T> {
-	
-	public var allowNull:Bool = false;
-	/*
-	 * Used in the default error messages. Example: '$itemName cannot be null'
-	 */
-	public var itemName:String;
-	public var rules:Array<ValidationRule<T>> = [];
+abstract Validator(Array<String>) from Array<String> {
 
-	/*
-	 *   Strategy for converting / combinig validation errors to a tink.core.Error
-	 *  Validator.errorsAsTinkError is the default 
-	 */
-	public var tinkErrAdapter:Array<String>->String->Error = errorsAsTinkError;
-	
+    //potentially all this is just an abstract...
 
-	public function new(itemName:String) {
-		this.itemName = itemName;
+    public function new(){
+        this = [];
+    }
+
+    private function addError(err:String){
+        this.push(err);
+    }
+
+    public function errors():ReadOnlyArray<String> {
+        return this;
+    }
+
+    public function assertThat<T>(obj:T, name:String):ValueValidator<T>{
+        return new ValueValidator<T>(obj, name, this);
+    }
+
+    public function firstError():Null<String> {
+		return this.getOrNull(0);
 	}
 
-	public function errors(x:T):Array<String> {
-		if (x == null) {
-			if (allowNull) {
-				return [];
-			} else {
-				return ['${itemName} cannot be null.'];
-			}
-		}
-
-		var errs = new Array<String>();
-		for (rule in rules) {
-			var res = rule(x);
-			switch (res) {
-				case Pass:
-				case Fail(errors):
-					errs = errs.concat(errors);
-				case FailAndExit(errors):
-					errs = errs.concat(errors);
-					break;
-			}
-		}
-		return errs;
+	public function isValid():Bool {
+		return this.length == 0;
 	}
 
-	public function firstError(x:T):Null<String> {
-		return errors(x).shift();
-	}
-
-	public function isValid(x:T):Bool {
-		return errors(x).length == 0;
-	}
-
-	public function validOutcome(x:T):Outcome<T, Error> {
-		var errs = errors(x);
-		if (errs.length == 0) {
-			return Success(x);
-		}
-		var tinkErr = tinkErrAdapter(errs, itemName);
-		return Failure(tinkErr);
-	}
-
-	public function asRule<X>(mapper:X->T):ValidationRule<X> {
-		return function(x:X):ValidationOutcome {
-			var t = mapper(x);
-			var errs = errors(t);
-			if (errs.length == 0) {
-				return Pass;
-			}
-			return Fail(errs);
-		}
-	}
-
-	/*
-	 * returns this, for fluid api
-	 */
-	public function addRule(rule:ValidationRule<T>):Validator<T> {
-		rules.push(rule);
-		return this;
-	}
-
-	public static function errorsAsTinkError(errs:Array<String>, name:String):Error {
-		var msg = errs.join(" ");
-		return new Error(ErrorCode.BadRequest, msg);
-	}
 }
+
+
+

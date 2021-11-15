@@ -1,4 +1,4 @@
-package yaku_beta.valid;
+package yaku_beta.valid1;
 
 enum ValidationOutcome {
 	Pass();

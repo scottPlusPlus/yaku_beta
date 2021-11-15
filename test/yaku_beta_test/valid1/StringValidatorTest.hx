@@ -1,6 +1,6 @@
-package yaku_beta_test.valid;
+package yaku_beta_test.valid1;
 
-import yaku_beta.valid.StringValidator;
+import yaku_beta.valid1.StringValidator;
 import utest.Assert;
 import tink.core.Outcome;
 

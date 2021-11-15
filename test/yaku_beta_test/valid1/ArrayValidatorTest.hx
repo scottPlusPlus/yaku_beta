@@ -1,7 +1,7 @@
-package yaku_beta_test.valid;
+package yaku_beta_test.valid1;
 
-import yaku_beta.valid.Validator;
-import yaku_beta.valid.ArrayValidator;
+import yaku_beta.valid1.Validator;
+import yaku_beta.valid1.ArrayValidator;
 import utest.Assert;
 
 using yaku_core.NullX;
