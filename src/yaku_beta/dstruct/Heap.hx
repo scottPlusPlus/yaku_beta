@@ -7,8 +7,8 @@ class Heap<T> {
 
 	private final compare:T->T->Int;
 
-	public function new(compare:T->T->Int) {
-		this.compare = compare;
+	public function new(compare_strategy:T->T->Int) {
+		this.compare = compare_strategy;
 		this.length = 0;
 		var initSize = 9;
 		data = [];
