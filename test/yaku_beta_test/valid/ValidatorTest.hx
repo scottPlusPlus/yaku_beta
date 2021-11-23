@@ -94,6 +94,7 @@ class ValidatorTest extends utest.Test {
         var newErrs = newValidator(subject, "foo").errors();
         var oldErrs = oldValidator.errors(subject);
         trace('Validation:\n newErrs: $newErrs \n oldErrs: $oldErrs \n');
+		Assert.pass();
     }
 }
 

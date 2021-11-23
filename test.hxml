@@ -4,9 +4,13 @@
 -lib compiletime
 -lib yaku_core
 -lib hamcrest
+-lib json2object
 
 -debug
 -cp src
 -cp test
+
+--macro yaku_beta.macros.Replacer2.copyProjectAssets()
+
 -main TestsMain
 -js bin/test.js 
