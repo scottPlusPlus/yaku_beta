@@ -1,43 +1,84 @@
 package yaku_beta.valid;
 
+import yaku_beta.valid.ValidationRule;
 import haxe.ds.ReadOnlyArray;
+import tink.core.Error;
+import tink.CoreApi.Outcome;
 
-abstract Validation<T> (ValidationEnum<T>) from ValidationEnum<T> {
+using yaku_core.NullX;
+using yaku_core.ArrayX;
 
-  @:from inline static function fromLazyValidator<T>(x:T->String->Validator<T>):Validation<T> {
-    return ValidationEnum.LazyValidator(x);
-  }
+class Validation<T> {
 
-  @:from inline static function fromLazyErrors<T>(x:T->String->ReadOnlyArray<String>):Validation<T> {
-    return ValidationEnum.LazyErrors(x);
-  }
+	public function new(value:T, name:String, ?errors:Array<String>) {
+		this._errors = errors.orFallback([]);
+		this.value = value;
+		this.isNull = (value == null);
+        this.name = name;
+		if (isNull) {
+			this._nullErr = '$name is null';
+			this._errors.push(this._nullErr);
+		}
+	}
 
-  @:from inline static function fromReadyValidator<T>(x:Validator<T>):Validation<T> {
-    return ValidationEnum.ReadyValidator(x);
-  }
+	private var _errors:Array<String> = [];
+	private var _nullErr:String;
 
-  @:from inline static function fromReadyErrors<T>(x:ReadOnlyArray<String>):Validation<T> {
-    return ValidationEnum.ReadyErrors(x);
-  }
+	public var value(default, null):T;
+	public var name(default, null):String;
+	public var isNull(default, null):Bool;
 
-  public function errors(value:T, name:String) :ReadOnlyArray<String> {
-    switch(this){
-        case LazyValidator(x):
-            return x(value, name).errors();
-        case  LazyErrors(x):
-            return x(value, name);
-        case ReadyValidator(x):
-            return x.errors();
-        case ReadyErrors(x):
-            return x;
-    }
-  }
+	public function allowNull() {
+        //we assume null is bad from the constructor, so need to remove that error if it is later allowed
+		_errors.remove(_nullErr);
+        return this;
+	}
 
-}
+	public function addRule(v:ValidationRule<T>):Validation<T> {
+		if (isNull) {
+			return this;
+		}
+        var newErrors = v.errors(value, name);
+		for (err in newErrors) {
+			_errors.push(err);
+		}
+		return this;
+	}
 
-enum ValidationEnum<T> {
-    LazyValidator(v:T->String->Validator<T>);
-    LazyErrors(v:T->String->ReadOnlyArray<String>);
-    ReadyValidator(v:Validator<T>);
-    ReadyErrors(v:ReadOnlyArray<String>);
+	public function assertThat<U>(obj:U, name:String):Validation<U> {
+		return new Validation<U>(obj, name, _errors);
+	}
+
+
+    public inline function errors():ReadOnlyArray<String> {
+		return _errors;
+	}
+
+	public inline function firstError():Null<String> {
+		return _errors.getOrNull(0);
+	}
+
+	public inline function isValid():Bool {
+		return _errors.length == 0;
+	}
+
+	public inline function asOutcome():Outcome<T, Error> {
+		if (_errors.length == 0) {
+			return Success(value);
+		}
+		var tinkErr = tinkErrAdapter(_errors, name);
+		return Failure(tinkErr);
+	}
+
+    /*
+	 *  Strategy for converting / combinig validation errors to a tink.core.Error
+	 *  Validator.errorsAsTinkError is the default 
+	 */
+	public static var tinkErrAdapter:Array<String>->String->Error = errorsAsTinkError;
+
+	public static function errorsAsTinkError(errs:Array<String>, name:String):Error {
+		var msg = errs.join(", ");
+		return new Error(ErrorCode.BadRequest, msg);
+	}
+
 }

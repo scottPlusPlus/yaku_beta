@@ -1,58 +1,58 @@
 package yaku_beta_test.valid;
 
 import haxe.ds.ReadOnlyArray;
-import yaku_beta.valid.Validator;
+import yaku_beta.valid.Validation;
 import utest.Assert;
 
 using yaku_core.NullX;
-using yaku_beta.valid.StringValidator;
-using yaku_beta.valid.NumValidator;
+using yaku_beta.valid.StringValidation;
+using yaku_beta.valid.NumValidation;
 
-class ValidatorTest extends utest.Test {
+class ValidationTest extends utest.Test {
 	function testValidator() {
-		var myValidator:VTestClass->String->Validator<VTestClass>;
-		myValidator = function(obj:VTestClass, name:String):Validator<VTestClass> {
-			var v = new Validator(obj, name);
+		var testValidation:VTestClass->String->Validation<VTestClass>;
+		testValidation = function(obj:VTestClass, name:String):Validation<VTestClass> {
+			var v = new Validation(obj, name);
 			v.assertThat(obj.str, '$name.str').minLength(3).maxLength(12);
 			v.assertThat(obj.num, '$name.num').minValue(0).maxValue(100);
-			v.assertThat(obj.child, '$name.child').rule(myValidator).allowNull();
+			v.assertThat(obj.child, '$name.child').addRule(testValidation).allowNull();
 			return v;
 		}
 
 		var foo = VTestClass.example();
-		Assert.isTrue(myValidator(foo, "Foo").isValid());
+		Assert.isTrue(testValidation(foo, "Foo").isValid());
 
 		foo.child.str = "";
-		Assert.equals(1, myValidator(foo, "Foo").errors().length);
-		Assert.stringContains("Foo.child.str", myValidator(foo, "Foo").firstError());
+		Assert.equals(1, testValidation(foo, "Foo").errors().length);
+		Assert.stringContains("Foo.child.str", testValidation(foo, "Foo").firstError());
 
 		foo.num = 200;
-		Assert.equals(2, myValidator(foo, "Foo").errors().length);
+		Assert.equals(2, testValidation(foo, "Foo").errors().length);
 	}
 
 	function testRuleUnification() {
 		var foo = VTestClass.example();
-		var v = new Validator(foo, "Foo");
+		var v = new Validation(foo, "Foo");
 
-		v.rule(["An Error!"]);
-		v.rule(function(obj:VTestClass, name:String) {
+		v.addRule(["An Error!"]);
+		v.addRule(function(obj:VTestClass, name:String) {
 			if (obj.child != null) {
 				return ['$name child should be null'];
 			}
 			return [];
 		});
-		v.rule(function(obj:VTestClass, name:String) {
-			var v2 = new Validator(obj, name);
+		v.addRule(function(obj:VTestClass, name:String) {
+			var v2 = new Validation(obj, name);
 			v2.assertThat(obj.str, '$name.str').minLength(123);
 			return v2;
 		});
 		Assert.equals(3, v.errors().length);
 	}
 
-    function namedValidator(obj:VTestClass, name:String):Validator<VTestClass> {
-        var v = new Validator(obj, name);
+    function namedValidator(obj:VTestClass, name:String):Validation<VTestClass> {
+        var v = new Validation(obj, name);
         v.assertThat(obj.str, '$name.str').minLength(3).maxLength(12);
-        v.assertThat(obj.child, '$name.child').rule(namedValidator).allowNull();
+        v.assertThat(obj.child, '$name.child').addRule(namedValidator).allowNull();
         return v;
     }
 
@@ -60,11 +60,11 @@ class ValidatorTest extends utest.Test {
         var loops = 1000000;
         var subject = VTestClass.example();
 
-        var newValidator:VTestClass->?String->Validator<VTestClass>;
-        newValidator = function(obj:VTestClass, name:String = "VTest"):Validator<VTestClass> {
-			var v = new Validator(obj, name);
+        var newValidation:VTestClass->?String->Validation<VTestClass>;
+        newValidation = function(obj:VTestClass, name:String = "VTest"):Validation<VTestClass> {
+			var v = new Validation(obj, name);
 			v.assertThat(obj.str, '$name.str').minLength(3).maxLength(12).contains("first");
-			v.assertThat(obj.child, '$name.child').rule(newValidator).allowNull();
+			v.assertThat(obj.child, '$name.child').addRule(newValidation).allowNull();
 			return v;
 		}
 
@@ -77,7 +77,7 @@ class ValidatorTest extends utest.Test {
 
         var start = Date.now().getTime();
         for (_ in 0...loops){
-            var errs = newValidator(subject).errors();
+            var errs = newValidation(subject).errors();
             var _ = errs.length;
         }
         var newTime = Date.now().getTime() - start;
@@ -91,7 +91,7 @@ class ValidatorTest extends utest.Test {
 
         trace('Validation:\nnewTime: $newTime \noldTime: $oldTime \n');
 
-        var newErrs = newValidator(subject, "foo").errors();
+        var newErrs = newValidation(subject, "foo").errors();
         var oldErrs = oldValidator.errors(subject);
         trace('Validation:\n newErrs: $newErrs \n oldErrs: $oldErrs \n');
 		Assert.pass();
