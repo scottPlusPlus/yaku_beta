@@ -29,6 +29,10 @@ class SortedArray<T> {
 		return new SortedArray(arr, compare);
 	}
 
+	public function copyArray():Array<T> {
+		return arr.copy();
+	}
+
 	public function filter(f:T->Bool):Array<T> {
 		return arr.filter(f);
 	}
