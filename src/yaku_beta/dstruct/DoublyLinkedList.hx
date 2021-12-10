@@ -29,7 +29,7 @@ class DoublyLinkedList<T> {
 			q.next = x;
 		q = x;
 		length++;
-        return x;
+		return x;
 	}
 
 	public function insertAfter(node:DLListNode<T>, item:T) {
@@ -46,7 +46,9 @@ class DoublyLinkedList<T> {
 	public function insertBefore(node:DLListNode<T>, item:T) {
 		var p = node.prev;
 		var x = new DLListNode<T>(item, node, p);
-		p.next = x;
+		if (p != null) {
+			p.next = x;
+		}
 		node.prev = x;
 		if (h == node) {
 			h = x;
@@ -103,7 +105,7 @@ class DoublyLinkedList<T> {
 		if (h == null)
 			return null;
 		var x = h;
-        removeNode(h);
+		removeNode(h);
 		return x;
 	}
 
@@ -151,13 +153,13 @@ class DoublyLinkedList<T> {
 		}
 		var prev = n.prev;
 		var next = n.next;
-        if (prev != null){
-            prev.next = next;
-        }
-		if (next != null){
-            next.prev = prev;
-        }
-        length--;
+		if (prev != null) {
+			prev.next = next;
+		}
+		if (next != null) {
+			next.prev = prev;
+		}
+		length--;
 	}
 
 	/**
@@ -174,8 +176,8 @@ class DoublyLinkedList<T> {
 		return new DLListKeyValueIterator(h);
 	}
 
-    /**
-        Returns an iterator on the elements of the list.
+	/**
+		Returns an iterator on the elements of the list.
 	**/
 	public inline function nodeIterator():DLListNodeIterator<T> {
 		return new DLListNodeIterator<T>(h);
@@ -291,7 +293,7 @@ private class DLListIterator<T> {
 }
 
 private class DLListNodeIterator<T> {
-    var head:DLListNode<T>;
+	var head:DLListNode<T>;
 
 	public inline function new(head:DLListNode<T>) {
 		this.head = head;
