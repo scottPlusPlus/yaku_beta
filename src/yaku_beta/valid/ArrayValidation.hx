@@ -19,4 +19,12 @@ class ArrayValidation {
         }
         return validation;
     }
+
+    public static inline function validateEach<T>(validation:Validation<Array<T>>, rule:ValidationRule<T>):Validation<Array<T>> {
+        for (index in 0...validation.value.length){
+            var item = validation.value[index];
+            validation.validateObject(item, 'item[$index] ').addRule(rule);
+        }
+        return validation;
+    }
 }
