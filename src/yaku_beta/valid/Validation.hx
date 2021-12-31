@@ -45,7 +45,12 @@ class Validation<T> {
 		return this;
 	}
 
-	public function assertThat<U>(obj:U, name:String):Validation<U> {
+	public function addError(error:String):Validation<T> {
+		_errors.push(error);
+		return this;
+	}
+
+	public function validateObject<U>(obj:U, name:String):Validation<U> {
 		return new Validation<U>(obj, name, _errors);
 	}
 

@@ -13,9 +13,9 @@ class ValidationTest extends utest.Test {
 		var testValidation:VTestClass->String->Validation<VTestClass>;
 		testValidation = function(obj:VTestClass, name:String):Validation<VTestClass> {
 			var v = new Validation(obj, name);
-			v.assertThat(obj.str, '$name.str').minLength(3).maxLength(12);
-			v.assertThat(obj.num, '$name.num').minValue(0).maxValue(100);
-			v.assertThat(obj.child, '$name.child').addRule(testValidation).allowNull();
+			v.validateObject(obj.str, '$name.str').minLength(3).maxLength(12);
+			v.validateObject(obj.num, '$name.num').minValue(0).maxValue(100);
+			v.validateObject(obj.child, '$name.child').addRule(testValidation).allowNull();
 			return v;
 		}
 
@@ -34,7 +34,7 @@ class ValidationTest extends utest.Test {
 		var foo = VTestClass.example();
 		var v = new Validation(foo, "Foo");
 
-		v.addRule(["An Error!"]);
+		v.addError("An Error!");
 		v.addRule(function(obj:VTestClass, name:String) {
 			if (obj.child != null) {
 				return ['$name child should be null'];
@@ -43,7 +43,7 @@ class ValidationTest extends utest.Test {
 		});
 		v.addRule(function(obj:VTestClass, name:String) {
 			var v2 = new Validation(obj, name);
-			v2.assertThat(obj.str, '$name.str').minLength(123);
+			v2.validateObject(obj.str, '$name.str').minLength(123);
 			return v2;
 		});
 		Assert.equals(3, v.errors().length);
@@ -51,8 +51,8 @@ class ValidationTest extends utest.Test {
 
     function namedValidator(obj:VTestClass, name:String):Validation<VTestClass> {
         var v = new Validation(obj, name);
-        v.assertThat(obj.str, '$name.str').minLength(3).maxLength(12);
-        v.assertThat(obj.child, '$name.child').addRule(namedValidator).allowNull();
+        v.validateObject(obj.str, '$name.str').minLength(3).maxLength(12);
+        v.validateObject(obj.child, '$name.child').addRule(namedValidator).allowNull();
         return v;
     }
 
@@ -63,8 +63,8 @@ class ValidationTest extends utest.Test {
         var newValidation:VTestClass->?String->Validation<VTestClass>;
         newValidation = function(obj:VTestClass, name:String = "VTest"):Validation<VTestClass> {
 			var v = new Validation(obj, name);
-			v.assertThat(obj.str, '$name.str').minLength(3).maxLength(12).contains("first");
-			v.assertThat(obj.child, '$name.child').addRule(newValidation).allowNull();
+			v.validateObject(obj.str, '$name.str').minLength(3).maxLength(12).contains("first");
+			v.validateObject(obj.child, '$name.child').addRule(newValidation).allowNull();
 			return v;
 		}
 
