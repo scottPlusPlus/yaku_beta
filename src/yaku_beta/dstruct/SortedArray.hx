@@ -10,26 +10,26 @@ using yaku_core.NullX;
 * An Array that is sorted.  Inserts done using binary search
 */
 class SortedArray<T> {
-	final arr:Array<T>;
+	public final array:Array<T>;
 	final compare:(T, T) -> Int;
 
     public var length(get,never):Int;
     public function get_length():Int {
-        return arr.length;
+        return array.length;
     }
 
 
-	public function new(arr:Array<T>, compare:(T, T) -> Int, dataIsPreSorted:Bool) {
-		this.arr = arr;
+	public function new(array:Array<T>, compare:(T, T) -> Int, dataIsPreSorted:Bool) {
+		this.array = array;
 		this.compare = compare;
 		if (!dataIsPreSorted){
-			arr.sort(compare);
+			array.sort(compare);
 		} else {
 			#if debug
 				//debug validation to ensure the array is sorted
-				if (arr.length > 1){
-					for (index in 1...arr.length){
-						var order = compare(arr[index-1], arr[index]);
+				if (array.length > 1){
+					for (index in 1...array.length){
+						var order = compare(array[index-1], array[index]);
 						if (order > 0){
 							Log.error("Array data is not pre-sorted");
 							break;
@@ -45,94 +45,89 @@ class SortedArray<T> {
 	}
 
 	public function copy():SortedArray<T> {
-		return new SortedArray(arr, compare, true);
-	}
-
-	public function copyArray():Array<T> {
-		return arr.copy();
+		return new SortedArray(array, compare, true);
 	}
 
 	public function filter(f:T->Bool):Array<T> {
-		return arr.filter(f);
+		return array.filter(f);
 	}
 
 	public function indexOf(val:T, ?fromIndex:Null<Int>):Int {
-		if (arr.length == 0){
+		if (array.length == 0){
 			return -1;
 		}
-		var index = binarySearch(arr, val, fromIndex.orFallback(0), arr.length-1);
-		if (arr[index] != val){
+		var index = binarySearch(array, val, fromIndex.orFallback(0), array.length-1);
+		if (array[index] != val){
 			return -1;
 		}
-		while (arr[index] == val){
+		while (array[index] == val){
 			index--;
 		}
 		return index+1;
 	}
 
     public function insert(val:T) {
-		Log.debug('insert $val into ${arr}');
-		if (arr.length == 0){
-			arr.push(val);
+		if (array.length == 0){
+			array.push(val);
 			return;
 		}
-		var index = binarySearch(arr, val, 0, arr.length - 1);
-		var c = compare(val, arr[index]);
+		var index = binarySearch(array, val, 0, array.length - 1);
+		var c = compare(val, array[index]);
 		if (c > 0){
 			index++;
 		}
-		arr.insert(index, val);
+		array.insert(index, val);
 	}
 
 	public function iterator():ArrayIterator<T> {
-		return arr.iterator();
+		return array.iterator();
 	}
 
 	public function join(sep:String):String {
-		return arr.join(sep);
+		return array.join(sep);
 	}
 
 	public function keyValueIterator():ArrayKeyValueIterator<T> {
-		return arr.keyValueIterator();
+		return array.keyValueIterator();
 	}
 
     public function lastIndexOf(val:T, ?fromIndex:Int):Int {
-		if (arr.length == 0){
+		if (array.length == 0){
 			return -1;
 		}
-		var index = binarySearch(arr, val, fromIndex.orFallback(0), arr.length-1);
-		if (arr[index] != val){
+		var index = binarySearch(array, val, fromIndex.orFallback(0), array.length-1);
+		if (array[index] != val){
 			return -1;
 		}
-		while (arr[index] == val){
+		while (array[index] == val){
 			index++;
 		}
 		return index-1;
     }
 
     public function map<S>(f:T -> S):Array<S> {
-        return arr.map(f);
+        return array.map(f);
     }
 
     public function pop():Null<T> {
-        return arr.pop();
+        return array.pop();
     }
 
     public function remove(x:T):Bool  {
         //TODO - can make faster
-        return arr.remove(x);
+        return array.remove(x);
     }
 
     public function shift():Null<T>{
-        return arr.shift();
+        return array.shift();
     }
 
     public function slice(pos:Int, ?end:Int):Array<T> {
-        return arr.slice(pos, end);
+        return array.slice(pos, end);
     }
 
     public function toString():String {
-        return arr.toString();
+        return array.toString();
     }
 
 	private function binarySearch(arr:Array<T>, val:T, start:Int, end:Int):Int {
@@ -141,7 +136,7 @@ class SortedArray<T> {
 			return start;
 		}
 		var mid = Std.int(start + (end - start) / 2);
-		var midVal = arr[mid];
+		var midVal = array[mid];
 		Log.debug('mid at $mid = $midVal');
 		var c = compare(val, midVal);
 		Log.debug('$val is $c than $midVal');

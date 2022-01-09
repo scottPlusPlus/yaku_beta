@@ -25,7 +25,7 @@ class SortedArrayTest extends utest.Test {
 
 	private function indexOfTests<T>(input:Array<T>, compare:T->T->Int, nonValues:Array<T>) {
 		var sorted = new SortedArray(input, compare, false);
-		var copy = sorted.copyArray();
+		var copy = sorted.array.copy();
 		for (index in 0...copy.length) {
 			var val = copy[index];
 			Assert.equals(index, sorted.indexOf(val));
@@ -53,7 +53,7 @@ class SortedArrayTest extends utest.Test {
 
 		var sorted = new SortedArray(input, compare, false);
 		sorted.insert(insertion);
-		var actual = sorted.copyArray();
+		var actual = sorted.array.copy();
 		var pass = Assert.same(expected, actual);
 		if (!pass) {
 			Log.debug('expected: $expected');
