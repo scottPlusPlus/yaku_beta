@@ -150,15 +150,15 @@ class SortedArray<T> {
 	}
 
 	private function binarySearch(arr:Array<T>, val:T, start:Int, end:Int):Int {
-		Log.debug('binary search from $start to $end');
+		//Log.debug('binary search from $start to $end');
 		if (start == end) {
 			return start;
 		}
 		var mid = Std.int(start + (end - start) / 2);
 		var midVal = array[mid];
-		Log.debug('mid at $mid = $midVal');
+		//Log.debug('mid at $mid = $midVal');
 		var c = compare(val, midVal);
-		Log.debug('$val is $c than $midVal');
+		//Log.debug('$val is $c than $midVal');
 		if (c < 0) {
 			return binarySearch(arr, val, start, mid);
 		} else if (c > 0) {
