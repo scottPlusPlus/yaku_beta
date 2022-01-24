@@ -32,7 +32,7 @@ class DoublyLinkedList<T> {
 		return x;
 	}
 
-	public function insertAfter(node:DLListNode<T>, item:T) {
+	public function insertAfter(node:DLListNode<T>, item:T):DLListNode<T> {
 		var n = node.next;
 		var x = new DLListNode<T>(item, n, node);
 		n.prev = x;
@@ -41,9 +41,10 @@ class DoublyLinkedList<T> {
 			q = x;
 		}
 		length++;
+		return x;
 	}
 
-	public function insertBefore(node:DLListNode<T>, item:T) {
+	public function insertBefore(node:DLListNode<T>, item:T):DLListNode<T> {
 		var p = node.prev;
 		var x = new DLListNode<T>(item, node, p);
 		if (p != null) {
@@ -54,6 +55,7 @@ class DoublyLinkedList<T> {
 			h = x;
 		}
 		length++;
+		return x;
 	}
 
 	public function nodeOf(item:T):Null<DLListNode<T>> {
@@ -70,11 +72,11 @@ class DoublyLinkedList<T> {
 
 		`this.length` increases by 1.
 	**/
-	public function push(item:T) {
+	public function push(item:T):DLListNode<T> {
 		if (h == null) {
-			add(item);
+			return add(item);
 		} else {
-			insertBefore(h, item);
+			return insertBefore(h, item);
 		}
 	}
 

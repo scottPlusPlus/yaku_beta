@@ -7,37 +7,42 @@ import haxe.iterators.ArrayIterator;
 using yaku_core.NullX;
 
 /*
-* An Array that is sorted.  Inserts done using binary search
-*/
+ * An Array that is sorted.  Inserts done using binary search
+ */
 class SortedArray<T> {
 	public final array:Array<T>;
-	final compare:(T, T) -> Int;
 
-    public var length(get,never):Int;
-    public function get_length():Int {
-        return array.length;
-    }
+	@:jignored private var compare:(T, T) -> Int;
 
+	@:jignored public var length(get, never):Int;
 
-	public function new(array:Array<T>, compare:(T, T) -> Int, dataIsPreSorted:Bool) {
+	public function get_length():Int {
+		return array.length;
+	}
+
+	public function new(array:Array<T>) {
 		this.array = array;
+	}
+
+	public function init(compare:(T, T) -> Int, dataIsPreSorted:Bool):SortedArray<T> {
 		this.compare = compare;
-		if (!dataIsPreSorted){
+		if (!dataIsPreSorted) {
 			array.sort(compare);
 		} else {
 			#if debug
-				//debug validation to ensure the array is sorted
-				if (array.length > 1){
-					for (index in 1...array.length){
-						var order = compare(array[index-1], array[index]);
-						if (order > 0){
-							Log.error("Array data is not pre-sorted");
-							break;
-						}
+			// debug validation to ensure the array is sorted
+			if (array.length > 1) {
+				for (index in 1...array.length) {
+					var order = compare(array[index - 1], array[index]);
+					if (order > 0) {
+						Log.error("Array data is not pre-sorted");
+						break;
 					}
 				}
+			}
 			#end
 		}
+		return this;
 	}
 
 	public function contains(val:T):Bool {
@@ -45,7 +50,12 @@ class SortedArray<T> {
 	}
 
 	public function copy():SortedArray<T> {
-		return new SortedArray(array, compare, true);
+		#if debug
+		errIfNotInitted();
+		#end
+		var x = new SortedArray(array);
+		x.init(compare, true);
+		return x;
 	}
 
 	public function filter(f:T->Bool):Array<T> {
@@ -53,27 +63,33 @@ class SortedArray<T> {
 	}
 
 	public function indexOf(val:T, ?fromIndex:Null<Int>):Int {
-		if (array.length == 0){
+		#if debug
+		errIfNotInitted();
+		#end
+		if (array.length == 0) {
 			return -1;
 		}
-		var index = binarySearch(array, val, fromIndex.orFallback(0), array.length-1);
-		if (array[index] != val){
+		var index = binarySearch(array, val, fromIndex.orFallback(0), array.length - 1);
+		if (array[index] != val) {
 			return -1;
 		}
-		while (array[index] == val){
+		while (array[index] == val) {
 			index--;
 		}
-		return index+1;
+		return index + 1;
 	}
 
-    public function insert(val:T) {
-		if (array.length == 0){
+	public function insert(val:T) {
+		#if debug
+		errIfNotInitted();
+		#end
+		if (array.length == 0) {
 			array.push(val);
 			return;
 		}
 		var index = binarySearch(array, val, 0, array.length - 1);
 		var c = compare(val, array[index]);
-		if (c > 0){
+		if (c > 0) {
 			index++;
 		}
 		array.insert(index, val);
@@ -91,44 +107,47 @@ class SortedArray<T> {
 		return array.keyValueIterator();
 	}
 
-    public function lastIndexOf(val:T, ?fromIndex:Int):Int {
-		if (array.length == 0){
+	public function lastIndexOf(val:T, ?fromIndex:Int):Int {
+		#if debug
+		errIfNotInitted();
+		#end
+		if (array.length == 0) {
 			return -1;
 		}
-		var index = binarySearch(array, val, fromIndex.orFallback(0), array.length-1);
-		if (array[index] != val){
+		var index = binarySearch(array, val, fromIndex.orFallback(0), array.length - 1);
+		if (array[index] != val) {
 			return -1;
 		}
-		while (array[index] == val){
+		while (array[index] == val) {
 			index++;
 		}
-		return index-1;
-    }
+		return index - 1;
+	}
 
-    public function map<S>(f:T -> S):Array<S> {
-        return array.map(f);
-    }
+	public function map<S>(f:T->S):Array<S> {
+		return array.map(f);
+	}
 
-    public function pop():Null<T> {
-        return array.pop();
-    }
+	public function pop():Null<T> {
+		return array.pop();
+	}
 
-    public function remove(x:T):Bool  {
-        //TODO - can make faster
-        return array.remove(x);
-    }
+	public function remove(x:T):Bool {
+		// TODO - can make faster
+		return array.remove(x);
+	}
 
-    public function shift():Null<T>{
-        return array.shift();
-    }
+	public function shift():Null<T> {
+		return array.shift();
+	}
 
-    public function slice(pos:Int, ?end:Int):Array<T> {
-        return array.slice(pos, end);
-    }
+	public function slice(pos:Int, ?end:Int):Array<T> {
+		return array.slice(pos, end);
+	}
 
-    public function toString():String {
-        return array.toString();
-    }
+	public function toString():String {
+		return array.toString();
+	}
 
 	private function binarySearch(arr:Array<T>, val:T, start:Int, end:Int):Int {
 		Log.debug('binary search from $start to $end');
@@ -143,9 +162,19 @@ class SortedArray<T> {
 		if (c < 0) {
 			return binarySearch(arr, val, start, mid);
 		} else if (c > 0) {
-			return binarySearch(arr, val, mid+1, end);
+			return binarySearch(arr, val, mid + 1, end);
 		} else {
 			return mid;
 		}
 	}
+
+	private inline function errIfNotInitted() {
+		if (compare == null) {
+			Log.error('SortedArray.compare has not been set.  Call init() on the Sorted array before using it.');
+		}
+	}
+
+	// public static function toJson<T>(obj:SortedArray<T>):String {
+	// 	return obj.array.t
+	// }
 }

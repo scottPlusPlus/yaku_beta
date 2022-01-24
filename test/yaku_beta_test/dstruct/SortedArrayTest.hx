@@ -1,5 +1,6 @@
 package yaku_beta_test.dstruct;
 
+import json2object.JsonWriter;
 import zenlog.LogSplitter;
 import zenlog.LogTester;
 import yaku_beta.dstruct.SortedArray;
@@ -14,7 +15,7 @@ class SortedArrayTest extends utest.Test {
 		indexOfTests([0, 1, 2, 3, 4, 5], CommonSorters.intsAscending, [-5, 10]);
 		indexOfTests([2, 4, 6, 8], CommonSorters.intsAscending, [0, 1, 3, 5, 7, 9]);
 
-		var s = new SortedArray([1, 1, 1, 2, 2, 2, 3, 3, 3], CommonSorters.intsAscending, true);
+		var s = new SortedArray([1, 1, 1, 2, 2, 2, 3, 3, 3]).init(CommonSorters.intsAscending, true);
 		Assert.equals(0, s.indexOf(1));
 		Assert.equals(2, s.lastIndexOf(1));
 		Assert.equals(3, s.indexOf(2));
@@ -24,7 +25,7 @@ class SortedArrayTest extends utest.Test {
 	}
 
 	private function indexOfTests<T>(input:Array<T>, compare:T->T->Int, nonValues:Array<T>) {
-		var sorted = new SortedArray(input, compare, false);
+		var sorted = new SortedArray(input).init(compare, false);
 		var copy = sorted.array.copy();
 		for (index in 0...copy.length) {
 			var val = copy[index];
@@ -51,7 +52,7 @@ class SortedArrayTest extends utest.Test {
 		expected.push(insertion);
 		expected.sort(compare);
 
-		var sorted = new SortedArray(input, compare, false);
+		var sorted = new SortedArray(input).init(compare, false);
 		sorted.insert(insertion);
 		var actual = sorted.array.copy();
 		var pass = Assert.same(expected, actual);
@@ -69,7 +70,7 @@ class SortedArrayTest extends utest.Test {
 		Log.Logger = splitter;
 
 		var input = [1, 10, 3];
-		var sorted = new SortedArray(input, CommonSorters.intsAscending, true);
+		var sorted = new SortedArray(input).init(CommonSorters.intsAscending, true);
 		var foundError = false;
 		for (err in logTester.errorData) {
 			if (err.message == "Array data is not pre-sorted") {
@@ -79,5 +80,19 @@ class SortedArrayTest extends utest.Test {
 		}
 		Log.Logger = mainLogger;
 		Assert.isTrue(foundError);
+	}
+
+	function testJson(){
+		var input = [1, 2, 3, 4];
+		var sorted = new SortedArray(input).init(CommonSorters.intsAscending, true);
+		var writer = new json2object.JsonWriter<SortedArray<Int>>();
+		var j = writer.write(sorted);
+		Log.debug('sorted as json:');
+		Log.warn(j);
+
+		var parser = new json2object.JsonParser<SortedArray<Int>>();
+		var actual = parser.fromJson(j);
+
+		Assert.equals(4, actual.array.length);
 	}
 }
