@@ -7,6 +7,7 @@ import utest.Assert;
 using yaku_core.NullX;
 using yaku_beta.valid.StringValidation;
 using yaku_beta.valid.NumValidation;
+using yaku_beta.valid.ArrayValidation;
 
 class ValidationTest extends utest.Test {
 	function testValidator() {
@@ -55,6 +56,23 @@ class ValidationTest extends utest.Test {
         v.validateObject(obj.child, '$name.child').addRule(namedValidator).allowNull();
         return v;
     }
+
+	function testNullSafety() {
+		var vString = new Validation<String>(null, "nullString");
+		vString.minLength(3);
+		vString.maxLength(4);
+		Assert.equals(1, vString.errors().length);
+
+		var vNum = new Validation<Int>(null, "nullNum");
+		vNum.minValue(5);
+		vNum.minValue(10);
+		Assert.equals(1, vString.errors().length);
+
+		var vArray = new Validation<Array<String>>(null, "nullArray");
+		vArray.minLength(4);
+		vArray.maxLength(20);
+		Assert.equals(1, vArray.errors().length);
+	}
 
     function testSpeed(){
         var loops = 1000000;

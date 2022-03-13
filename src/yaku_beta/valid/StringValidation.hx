@@ -4,7 +4,7 @@ using yaku_core.NullX;
 
 class StringValidator {
 	public static inline function minLength(validation:Validation<String>, v:UInt, ?errMsgOverride:String):Validation<String> {
-		if (validation.value.length < v) {
+		if (!validation.isNull && validation.value.length < v) {
 			var msg = errMsgOverride.orFallback('${validation.name} must be less than ${v} chars.');
 			validation.addError(msg);
 		}
@@ -12,7 +12,7 @@ class StringValidator {
 	}
 
 	public static inline function maxLength(validation:Validation<String>, v:UInt, ?errMsgOverride:String):Validation<String> {
-		if (validation.value.length > v) {
+		if (!validation.isNull && validation.value.length > v) {
 			var msg = errMsgOverride.orFallback('${validation.name} must be at least ${v} chars.');
 			validation.addError(msg);
 		}
@@ -20,7 +20,7 @@ class StringValidator {
 	}
 
 	public static inline function contains(validation:Validation<String>, needle:String, ?errMsgOverride:String):Validation<String> {
-		if (!StringTools.contains(validation.value, needle)) {
+		if (!validation.isNull && !StringTools.contains(validation.value, needle)) {
 			var msg = errMsgOverride.orFallback('${validation.name} must contain ${needle}');
 			validation.addError(msg);
 		}
@@ -28,7 +28,7 @@ class StringValidator {
 	}
 
 	public static inline function regex(validation:Validation<String>, regex:EReg, errMsg:String):Validation<String> {
-		if (!regex.match(validation.value)) {
+		if (!validation.isNull && !regex.match(validation.value)) {
 			validation.addError(errMsg);
 		}
 		return validation;
