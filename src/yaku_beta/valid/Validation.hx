@@ -50,6 +50,13 @@ class Validation<T> {
 		return this;
 	}
 
+	public function addErrors(errors:Iterable<String>):Validation<T> {
+		for(e in errors){
+			_errors.push(e);
+		}
+		return this;
+	}
+
 	public function validateObject<U>(obj:U, name:String):Validation<U> {
 		return new Validation<U>(obj, name, _errors);
 	}
